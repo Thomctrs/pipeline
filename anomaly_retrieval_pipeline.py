@@ -104,7 +104,7 @@ class Pipeline:
             prompt += f"Anomaly {idx + 1}:\nTitle: {anomaly['title']}\nDescription: {anomaly['description']}\n\n"
         prompt += "Please provide a detailed recommendation to solve the user's problem based on the similarities with these anomalies."
         
-        openai.api_key = os.getenv("OPENAI_API_KEY")
+        openai.api_key = self.valves.OPENAI_API_KEY
 
         response = openai.chat.completions.create(
             
@@ -113,7 +113,7 @@ class Pipeline:
                 {"role": "system", "content": "You are an expert at providing solutions for software anomalies."},
                 {"role": "user", "content": prompt}
             ],
-            OPENAI_API_KEY=os.getenv("OPENAI_API_KEY")
+            
 
         )
 
