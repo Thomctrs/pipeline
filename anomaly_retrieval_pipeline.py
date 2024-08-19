@@ -5,11 +5,12 @@ from neo4j import GraphDatabase
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import TruncatedSVD
-import openai
+import openai   
 import os
-import llama_index
 from pydantic import BaseModel
-from config import *
+from dotenv import load_dotenv
+
+
 
 class Pipeline:
     class Valves(BaseModel):
@@ -24,7 +25,7 @@ class Pipeline:
     def __init__(self):
         self.documents = None
         self.index = None
-
+        load_dotenv()
         self.valves = self.Valves(
             **{
                 "LLAMAINDEX_OLLAMA_BASE_URL": os.getenv("LLAMAINDEX_OLLAMA_BASE_URL", "http://localhost:11434"),
@@ -33,8 +34,8 @@ class Pipeline:
                 "NEO4J_URI": os.getenv("NEO4J_URI", "bolt://localhost:7687"),
                 "NEO4J_USER": os.getenv("NEO4J_USER", "neo4j"),
                 "NEO4J_PASSWORD": os.getenv("NEO4J_PASSWORD", "password"),
-                "OPENAI_API_KEY": os.getenv("OPENAI_API_KEY", "your-openai-api-key"),
-            }
+                "OPENAI_API_KEY": os.getenv("OPENAI_API_KEY"),
+            } 
         )
 
         openai.api_key = self.valves.OPENAI_API_KEY
@@ -42,7 +43,7 @@ class Pipeline:
     async def on_startup(self):
         from llama_index.embeddings.ollama import OllamaEmbedding
         from llama_index.llms.ollama import Ollama
-        from llama_index.core  import Settings, VectorStoreIndex, SimpleDirectoryReader
+        from llama_index.core import Settings, VectorStoreIndex, SimpleDirectoryReader
 
         Settings.embed_model = OllamaEmbedding(
             model_name=self.valves.LLAMAINDEX_EMBEDDING_MODEL_NAME,
@@ -56,8 +57,8 @@ class Pipeline:
         global documents, index
 
         # Optionally, load documents if needed for LlamaIndex
-        # self.documents = SimpleDirectoryReader("/app/backend/data").load_data()
-        # self.index = VectorStoreIndex.from_documents(self.documents)
+        #self.documents = SimpleDirectoryReader("/app/backend/data").load_data()
+        #self.index = VectorStoreIndex.from_documents(self.documents)
         pass
 
     async def on_shutdown(self):
@@ -111,8 +112,8 @@ class Pipeline:
             ]
         )
 
-        return response['choices'][0]['message']['content'].strip()
-
+        return response.choices[0].message.content.strip()
+    
     def pipe(
         self, user_message: str, model_id: str, messages: List[dict], body: dict
     ) -> Union[str, Generator, Iterator]:
@@ -162,11 +163,14 @@ class Pipeline:
             "top 3 anomalies": top3_anomalies,
             "recommendation_text": recommendation_text
         }, indent=4)
+        
 
         return result
+    
+    class AnomalyRetrievalAndRecommendationPipeline:
+        @staticmethod
+        async def run_pipeline(user_message: str, model_id: str, messages: List[dict], body: dict) -> str:
      
-class AnomalyRetrievalAndRecommendationPipeline:
-    @staticmethod
-    def run_pipeline(user_message: str, model_id: str, messages: List[dict], body: dict) -> str:
-        pipeline = Pipeline()
-        return pipeline.pipe(user_message, model_id, messages, body)
+            pipeline = Pipeline()
+            await pipeline.on_startup()
+            return pipeline.pipe(user_message, model_id, messages, body)
