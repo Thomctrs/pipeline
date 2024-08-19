@@ -107,11 +107,13 @@ class Pipeline:
         openai.api_key = os.getenv("OPENAI_API_KEY")
 
         response = openai.chat.completions.create(
+            
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "You are an expert at providing solutions for software anomalies."},
                 {"role": "user", "content": prompt}
-            ]
+            ],
+            OPENAI_API_KEY=os.getenv("OPENAI_API_KEY")
 
         )
 
