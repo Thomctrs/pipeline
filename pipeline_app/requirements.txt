@@ -1,0 +1,7 @@
+Flask==2.0.3
+openai==0.27.0
+neo4j==5.6.0
+scikit-learn==1.2.0
+numpy==1.24.2
+pydantic==1.10.5
+Werkzeug==2.2.3
