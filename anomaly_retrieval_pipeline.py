@@ -7,6 +7,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import TruncatedSVD
 import openai   
 import os
+import re
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
@@ -71,6 +72,14 @@ class Pipeline:
     async def on_shutdown(self):
         # Actions to perform on server shutdown
         pass
+
+    def extract_title_from_prompt(self, user_input: str) -> str:
+        # Utilise une expression régulière pour extraire la partie après "here is the title of my anomaly: "
+        match = re.search(r"the title of my anomaly: (.+)", user_input, re.IGNORECASE)
+        if match:
+            return match.group(1).strip()
+        else:
+            return None
 
     def neo4j_connection(self):
         return GraphDatabase.driver(self.valves.NEO4J_URI, auth=(self.valves.NEO4J_USER, self.valves.NEO4J_PASSWORD))
@@ -144,6 +153,13 @@ class Pipeline:
             return "Thanks for using our pipeline. Please provide the title of the new anomaly to start again."
 
     def process_user_response(self, user_input):
+
+        new_title = self.extract_title_from_prompt(user_input)
+        if new_title:
+            self.anomaly_data['title'] = new_title
+            self.conversation_state = "ask_abstract"  # Passe directement à l'état suivant
+            return self.ask_next_question()
+        
         user_input = user_input.strip()
 
         if self.conversation_state == "start" and user_input != "reset":
