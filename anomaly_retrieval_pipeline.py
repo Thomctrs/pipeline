@@ -145,10 +145,10 @@ class Pipeline:
 
     def process_user_response(self, user_input):
         user_input = user_input.strip()
-        print(f"State before processing: {self.conversation_state}, User input: {user_input}")
-    
-        if self.conversation_state == "original_query":
+        if self.conversation_state == "start":
             self.anomaly_data['original_query'] = user_input
+            self.conversation_state = "original_query"
+        elif self.conversation_state == "original_query":
             self.conversation_state = "ask_title"
         elif self.conversation_state == "ask_title":
             self.anomaly_data['title'] = user_input
