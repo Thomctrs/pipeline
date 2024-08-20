@@ -39,7 +39,8 @@ class Pipeline:
         )
 
         openai.api_key = self.valves.OPENAI_API_KEY
-        self.reset_pipeline()
+        self.anomaly_data = {}
+        self.conversation_state = "original_query"
 
 
     async def on_startup(self):
@@ -121,9 +122,6 @@ class Pipeline:
 
         return response.choices[0].message.content.strip()
     
-    async def reset_pipeline(self):
-        self.anomaly_data = {}
-        self.conversation_state = "original_query"
 
     def ask_next_question(self):
         if self.conversation_state == "original_query":
@@ -168,13 +166,16 @@ class Pipeline:
                 self.conversation_state = "finished"
                 response = self.ask_next_question()
                 # Réinitialisation de la pipeline à la fin du cycle
-                self.reset_pipeline()
+                self.anomaly_data = {}
+                self.conversation_state = "original_query"
                 return response
             else:
                 self.conversation_state = "original_query"
+                self.anomaly_data = {}
                 return "Let's start. Please provide the title of the new anomaly."
         else:
-            self.reset_pipeline()
+            self.anomaly_data = {}
+            self.conversation_state = "original_query"
             return "Let's start. Please provide the title of the new anomaly."
        
 
