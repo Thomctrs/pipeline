@@ -270,4 +270,7 @@ class Pipeline:
      
             pipeline = Pipeline()
             await pipeline.on_startup()
-            return pipeline.pipe(user_message, model_id, messages, body)
+            pipe_result =  pipeline.pipe(user_message, model_id, messages, body)
+            await pipeline.on_shutdown()
+
+            return pipe_result
