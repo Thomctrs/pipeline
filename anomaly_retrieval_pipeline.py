@@ -148,6 +148,11 @@ class Pipeline:
 
         if self.conversation_state == "start" and user_input != "reset":
             self.anomaly_data['start'] = user_input
+            self.conversation_state = "first_query"
+            return self.ask_next_question()
+        
+        elif self.conversation_state == "first_query" and user_input != "reset":
+            self.anomaly_data['first_query'] = user_input
             self.conversation_state = "ask_title"
             return self.ask_next_question()
         
