@@ -39,7 +39,7 @@ class Pipeline:
         )
 
         openai.api_key = self.valves.OPENAI_API_KEY
-        self.conversation_state = "ask_title"
+        self.conversation_state = "start"
         self.anomaly_data = {}
 
     async def on_startup(self):
@@ -124,20 +124,22 @@ class Pipeline:
 
     def ask_next_question(self):
         if self.conversation_state == "ask_title":
-            return "Please provide the title of the anomaly."
+            return "Ok Let's start ! Please provide the title of the anomaly."
         elif self.conversation_state == "ask_abstract":
             return "Please provide a brief abstract of the anomaly."
         elif self.conversation_state == "ask_number":
-            return "Please provide the anomaly number."
+            return "Now, Please provide the anomaly number."
         elif self.conversation_state == "ask_comment":
             return "Please provide any additional comments about the anomaly."
         elif self.conversation_state == "confirmation":
             return f"Here is the summary of the anomaly:\n\nTitle: {self.anomaly_data['title']}\nAbstract: {self.anomaly_data['abstract']}\nNumber: {self.anomaly_data['number']}\nComment: {self.anomaly_data['comment']}\n\nIs this information correct? (yes/no)"
         else:
-            return "Thank you! The anomaly has been recorded. Let me find the most similar anomalies for you."
+            return "Thank you! Your anomaly has been recorded. Let me find the most similar anomalies for you. \n Please enter to proceed"
 
     def process_user_response(self, user_input):
-        if self.conversation_state == "ask_title":
+        if self.conversation_state == "start":
+            self.conversation_state = "ask_title"
+        elif self.conversation_state == "ask_title":
             self.anomaly_data['title'] = user_input
             self.conversation_state = "ask_abstract"
         elif self.conversation_state == "ask_abstract":
