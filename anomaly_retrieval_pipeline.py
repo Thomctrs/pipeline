@@ -39,8 +39,8 @@ class Pipeline:
         )
 
         openai.api_key = self.valves.OPENAI_API_KEY
-        self.conversation_state = "original_query"
-        self.anomaly_data = {}
+        self.reset_pipeline()
+
 
     async def on_startup(self):
         from llama_index.embeddings.ollama import OllamaEmbedding
@@ -121,6 +121,9 @@ class Pipeline:
 
         return response.choices[0].message.content.strip()
     
+    async def reset_pipeline(self):
+        self.anomaly_data = {}
+        self.conversation_state = "original_query"
 
     def ask_next_question(self):
         if self.conversation_state == "original_query":
@@ -163,6 +166,11 @@ class Pipeline:
         elif self.conversation_state == "confirmation":
             if user_input.lower() in ["yes", "y"]:
                 self.conversation_state = "finished"
+                response = self.ask_next_question()
+                # Réinitialisation de la pipeline à la fin du cycle
+                self.reset_pipeline()
+                return response
+
             else:
                 self.conversation_state = "original_query"
                 return "Let's start. Please provide the title of the new anomaly."
@@ -176,8 +184,6 @@ class Pipeline:
     def pipe(
         self, user_message: str, model_id: str, messages: List[dict], body: dict
     ) -> Union[str, Generator, Iterator]:
-        
-        self.__init__()
 
         if self.conversation_state != "finished":
             return self.handle_conversation(user_message)
@@ -250,8 +256,6 @@ class Pipeline:
             "💡 **Recommendation to solve the issue** 💡\n"
             f"{recommendation_text}\n"
         )
-
-        self.__init__()
 
         return result
 
