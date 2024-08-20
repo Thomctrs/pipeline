@@ -147,15 +147,12 @@ class Pipeline:
             self.anomaly_data['original_query'] = user_input
             self.conversation_state = "ask_title"
         elif self.conversation_state == "ask_title":
-            print("ask_title")
             self.anomaly_data['title'] = user_input
             self.conversation_state = "ask_abstract"
         elif self.conversation_state == "ask_abstract":
-            print("ask_abstract")
             self.anomaly_data['abstract'] = user_input
             self.conversation_state = "ask_number"
         elif self.conversation_state == "ask_number":
-            print("ask_number")
             self.anomaly_data['number'] = user_input
             self.conversation_state = "ask_comment"
         elif self.conversation_state == "ask_comment":
@@ -165,18 +162,15 @@ class Pipeline:
             if user_input.lower() in ["yes", "y"]:
                 self.conversation_state = "finished"
                 response = self.ask_next_question()
-                # Réinitialisation de la pipeline à la fin du cycle
-                self.anomaly_data = {}
-                self.conversation_state = "original_query"
                 return response
             else:
                 self.conversation_state = "original_query"
                 self.anomaly_data = {}
-                return "Let's start. Please provide the title of the new anomaly."
+                return "Let's start again. Please provide the title of the new anomaly."
         else:
             self.anomaly_data = {}
             self.conversation_state = "original_query"
-            return "Let's start. Please provide the title of the new anomaly."
+            return "Let's start again. Please provide the title of the new anomaly."
        
 
         return self.ask_next_question()
