@@ -212,15 +212,33 @@ class Pipeline:
 
         # Step 4: Generate recommendation
         recommendation_text = self.generate_recommendation_text(top3_anomalies, problem)
-
-        result = json.dumps({
-            "problem": problem,
-            "top 3 anomalies": top3_anomalies,
-            "recommendation_text": recommendation_text
-        }, indent=4)
         
+        # Step 5: Return the result
+        result = (
+        "🛠 **Problem Details**\n"
+        f"   - **Title**: {problem['title']}\n"
+        f"   - **Abstract**: {problem['abstract']}\n"
+        f"   - **Number**: {problem['number']}\n"
+        f"   - **Comment**: {problem['comment']}\n\n"
+        
+        "🔍 **Top 3 Similar Anomalies**\n"
+        )
+
+        for i, anomaly in enumerate(top3_anomalies, 1):
+            result += (
+                f"   {i}. **Anomaly**\n"
+                f"      - **Title**: {anomaly['title']}\n"
+                f"      - **Description**: {anomaly['description']}\n"
+                f"      - **Similarity Score**: {anomaly['similarity_score']:.2f}\n\n"
+            )
+
+        result += (
+            "💡 **Recommendation to solve the issue**\n"
+            f"{recommendation_text}\n"
+        )
 
         return result
+
     
     class AnomalyRetrievalAndRecommendationPipeline:
         @staticmethod
