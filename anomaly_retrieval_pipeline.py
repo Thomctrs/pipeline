@@ -163,7 +163,7 @@ class Pipeline:
             if user_input.lower() in ["yes", "y"]:
                 self.conversation_state = "finished"
             else:
-                self.conversation_state = "ask_title"
+                self.conversation_state = "original_query"
                 return "Let's start. Please provide the title of the new anomaly."
 
         return self.ask_next_question()
