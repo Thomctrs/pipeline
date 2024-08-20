@@ -157,7 +157,7 @@ class Pipeline:
         new_title = self.extract_title_from_prompt(user_input)
         if new_title:
             self.anomaly_data['title'] = new_title
-            self.conversation_state = "ask_abstract"  # Passe directement à l'état suivant
+            self.conversation_state = "ask_title"  
             return self.ask_next_question()
         
         user_input = user_input.strip()
@@ -203,7 +203,8 @@ class Pipeline:
             
         elif user_input == "reset":
             self.reset_pipeline()
-            return "The conversation has been reset. Please provide the title of the new anomaly."
+            user_input = ""
+            return "The conversation has been reset."
 
         else:
             # Réinitialiser la conversation si l'état est inconnu
