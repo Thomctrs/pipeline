@@ -170,10 +170,13 @@ class Pipeline:
                 # Réinitialisation de la pipeline à la fin du cycle
                 self.reset_pipeline()
                 return response
-
             else:
                 self.conversation_state = "original_query"
                 return "Let's start. Please provide the title of the new anomaly."
+        else:
+            self.reset_pipeline()
+            return "Let's start. Please provide the title of the new anomaly."
+       
 
         return self.ask_next_question()
 
