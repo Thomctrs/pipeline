@@ -107,7 +107,7 @@ class Pipeline:
         openai.api_key = self.valves.OPENAI_API_KEY
 
         response = openai.chat.completions.create(
-            
+           
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "You are an expert at providing solutions for software anomalies."},
@@ -160,6 +160,8 @@ class Pipeline:
             for idx in most_similar_indices
         ]
 
+        openai.api_key = self.valves.OPENAI_API_KEY
+        
         # Step 4: Generate recommendation
         recommendation_text = self.generate_recommendation_text(top3_anomalies, problem)
 
