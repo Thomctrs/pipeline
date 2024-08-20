@@ -129,19 +129,19 @@ class Pipeline:
 
     def ask_next_question(self):
         if self.conversation_state == "start":
-            return "Welcome to the anomaly reporting system. Please provide the title of the anomaly you encountered"
+            return "welcome to the anomaly reporting system. Please provide the title of the anomaly you encountered"
         elif self.conversation_state == "ask_title":
-            return "Ok let's start ! Please provide the title of the anomaly."
+            return "ok let's start ! Please provide the title of the anomaly."
         elif self.conversation_state == "ask_abstract":
-            return "Please provide a brief abstract of the anomaly."
+            return "please provide a brief abstract of the anomaly."
         elif self.conversation_state == "ask_number":
-            return "Now, Please provide the anomaly number."
+            return "now, Please provide the anomaly number."
         elif self.conversation_state == "ask_comment":
-            return "Please provide any additional comments about the anomaly."
+            return "please provide any additional comments about the anomaly."
         elif self.conversation_state == "confirmation":
-            return f"Here is the summary of the anomaly:\n\nTitle: {self.anomaly_data['title']}\nAbstract: {self.anomaly_data['abstract']}\nNumber: {self.anomaly_data['number']}\nComment: {self.anomaly_data['comment']}\n\nIs this information correct? (yes/no)"
+            return f"here is the summary of the anomaly:\n\nTitle: {self.anomaly_data['title']}\nAbstract: {self.anomaly_data['abstract']}\nNumber: {self.anomaly_data['number']}\nComment: {self.anomaly_data['comment']}\n\nIs this information correct? (yes/no)"
         else:
-            return "Thank you! Your anomaly has been recorded. Let me find the most similar anomalies for you. \n Please enter to proceed"
+            return "thank you! Your anomaly has been recorded. Let me find the most similar anomalies for you. \n Please enter to proceed"
 
     def process_user_response(self, user_input):
         user_input = user_input.strip()
