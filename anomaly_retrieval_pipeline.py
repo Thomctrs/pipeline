@@ -160,7 +160,7 @@ class Pipeline:
                 self.conversation_state = "finished"
             else:
                 self.conversation_state = "ask_title"
-                return "Let's start over. Please provide the title of the new anomaly."
+                return "Let's start. Please provide the title of the new anomaly."
 
         return self.ask_next_question()
 
