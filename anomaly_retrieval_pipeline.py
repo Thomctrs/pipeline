@@ -126,7 +126,7 @@ class Pipeline:
         if self.conversation_state == "original_query":
             return "Welcome to the anomaly reporting system. Please provide the details of the anomaly you encountered"
         if self.conversation_state == "ask_title":
-            return f"Ok Let's start ! Please provide the title of the anomaly. {self.conversation_state}"
+            return f"Ok let's start ! Please provide the title of the anomaly. {self.conversation_state}"
         elif self.conversation_state == "ask_abstract":
             return f"Please provide a brief abstract of the anomaly.{self.conversation_state}"
         elif self.conversation_state == "ask_number":
