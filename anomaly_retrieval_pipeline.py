@@ -150,7 +150,7 @@ class Pipeline:
         elif self.conversation_state == "confirmation":
             return f"Here is the summary of the anomaly:\n\nTitle: {self.anomaly_data['title']}\nAbstract: {self.anomaly_data['abstract']}\nNumber: {self.anomaly_data['number']}\nComment: {self.anomaly_data['comment']}\n\nIs this information correct? (yes/no)"
         else:
-            return "Thanks for using our pipeline. Please provide the title of the new anomaly to start again."
+            return "Thanks for using our pipeline. Please enter a whitespace to start again."
 
     def process_user_response(self, user_input):
 
