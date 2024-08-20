@@ -123,7 +123,7 @@ class Pipeline:
     
 
     def ask_next_question(self):
-        if self.conversation_state == "start":
+        if self.conversation_state == "original_query":
             return "Welcome to the anomaly reporting system. Please provide the details of the anomaly you encountered"
         if self.conversation_state == "ask_title":
             return "Ok Let's start ! Please provide the title of the anomaly."
@@ -139,6 +139,7 @@ class Pipeline:
             return "Thank you! Your anomaly has been recorded. Let me find the most similar anomalies for you. \n Please enter to proceed"
 
     def process_user_response(self, user_input):
+        user_input = user_input.strip()
 
         if self.conversation_state == "original_query":
             self.anomaly_data['original_query'] = user_input
@@ -240,7 +241,7 @@ class Pipeline:
             )
 
         result += (
-            "💡 **Recommendation to solve the issue**  💡\n"
+            "💡 **Recommendation to solve the issue** 💡\n"
             f"{recommendation_text}\n"
         )
 
