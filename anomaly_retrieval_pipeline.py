@@ -39,6 +39,8 @@ class Pipeline:
         )
 
         openai.api_key = self.valves.OPENAI_API_KEY
+        self.conversation_state = "ask_title"
+        self.anomaly_data = {}
 
     async def on_startup(self):
         from llama_index.embeddings.ollama import OllamaEmbedding
@@ -119,14 +121,60 @@ class Pipeline:
 
         return response.choices[0].message.content.strip()
     
+
+    def ask_next_question(self):
+        if self.conversation_state == "ask_title":
+            return "Please provide the title of the anomaly."
+        elif self.conversation_state == "ask_abstract":
+            return "Please provide a brief abstract of the anomaly."
+        elif self.conversation_state == "ask_number":
+            return "Please provide the anomaly number."
+        elif self.conversation_state == "ask_comment":
+            return "Please provide any additional comments about the anomaly."
+        elif self.conversation_state == "confirmation":
+            return f"Here is the summary of the anomaly:\n\nTitle: {self.anomaly_data['title']}\nAbstract: {self.anomaly_data['abstract']}\nNumber: {self.anomaly_data['number']}\nComment: {self.anomaly_data['comment']}\n\nIs this information correct? (yes/no)"
+        else:
+            return "Thank you! The anomaly has been recorded. Let me find the most similar anomalies for you."
+
+    def process_user_response(self, user_input):
+        if self.conversation_state == "ask_title":
+            self.anomaly_data['title'] = user_input
+            self.conversation_state = "ask_abstract"
+        elif self.conversation_state == "ask_abstract":
+            self.anomaly_data['abstract'] = user_input
+            self.conversation_state = "ask_number"
+        elif self.conversation_state == "ask_number":
+            self.anomaly_data['number'] = user_input
+            self.conversation_state = "ask_comment"
+        elif self.conversation_state == "ask_comment":
+            self.anomaly_data['comment'] = user_input
+            self.conversation_state = "confirmation"
+        elif self.conversation_state == "confirmation":
+            if user_input.lower() in ["yes", "y"]:
+                self.conversation_state = "finished"
+            else:
+                self.conversation_state = "ask_title"
+                return "Let's start over. Please provide the title of the new anomaly."
+
+        return self.ask_next_question()
+
+    def handle_conversation(self, user_input):
+        return self.process_user_response(user_input)
+
+    
     def pipe(
         self, user_message: str, model_id: str, messages: List[dict], body: dict
     ) -> Union[str, Generator, Iterator]:
         
+        if self.conversation_state != "finished":
+            return self.handle_conversation(user_message)
+
         # Assuming the user_message contains the problem description
         problem = {
-            'title': user_message,
-            'abstract': user_message  # Adjust as necessary based on input
+            'title': self.anomaly_data['title'],
+            'abstract': self.anomaly_data['abstract'],
+            'number': self.anomaly_data['number'],
+            'comment': self.anomaly_data['comment']
         }
 
         # Step 1: Connect to Neo4j and retrieve anomalies
@@ -161,7 +209,7 @@ class Pipeline:
         ]
 
         openai.api_key = self.valves.OPENAI_API_KEY
-        
+
         # Step 4: Generate recommendation
         recommendation_text = self.generate_recommendation_text(top3_anomalies, problem)
 
