@@ -146,32 +146,32 @@ class Pipeline:
     def process_user_response(self, user_input):
         user_input = user_input.strip()
 
-        if self.conversation_state == "start":
+        if self.conversation_state == "start" and user_input != "reset":
             self.anomaly_data['start'] = user_input
             self.conversation_state = "ask_title"
             return self.ask_next_question()
         
-        elif self.conversation_state == "ask_title":
+        elif self.conversation_state == "ask_title" and user_input != "reset":
             self.anomaly_data['title'] = user_input
             self.conversation_state = "ask_abstract"
             return self.ask_next_question()
         
-        elif self.conversation_state == "ask_abstract":
+        elif self.conversation_state == "ask_abstract" and user_input != "reset":
             self.anomaly_data['abstract'] = user_input
             self.conversation_state = "ask_number"
             return self.ask_next_question()
         
-        elif self.conversation_state == "ask_number":
+        elif self.conversation_state == "ask_number" and user_input != "reset":
             self.anomaly_data['number'] = user_input
             self.conversation_state = "ask_comment"
             return self.ask_next_question()
         
-        elif self.conversation_state == "ask_comment":
+        elif self.conversation_state == "ask_comment" and user_input != "reset":
             self.anomaly_data['comment'] = user_input
             self.conversation_state = "confirmation"
             return self.ask_next_question()
         
-        elif self.conversation_state == "confirmation":
+        elif self.conversation_state == "confirmation" and user_input != "reset":
             if user_input.lower() in ["yes", "y"]:
                 self.conversation_state = "finished"
                 return "Thanks ! let's start processing the anomaly data..."
