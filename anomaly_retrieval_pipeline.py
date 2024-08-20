@@ -145,12 +145,15 @@ class Pipeline:
             self.anomaly_data['original_query'] = user_input
             self.conversation_state = "ask_title"
         elif self.conversation_state == "ask_title":
+            print("ask_title")
             self.anomaly_data['title'] = user_input
             self.conversation_state = "ask_abstract"
         elif self.conversation_state == "ask_abstract":
+            print("ask_abstract")
             self.anomaly_data['abstract'] = user_input
             self.conversation_state = "ask_number"
         elif self.conversation_state == "ask_number":
+            print("ask_number")
             self.anomaly_data['number'] = user_input
             self.conversation_state = "ask_comment"
         elif self.conversation_state == "ask_comment":
