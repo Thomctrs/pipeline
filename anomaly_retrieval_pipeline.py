@@ -23,8 +23,8 @@ class Pipeline:
         OPENAI_API_KEY: str
 
     def __init__(self):
-        self.documents = None
-        self.index = None
+
+        self.reset_pipeline()
         load_dotenv()
         self.valves = self.Valves(
             **{
@@ -39,9 +39,13 @@ class Pipeline:
         )
 
         openai.api_key = self.valves.OPENAI_API_KEY
+        
+
+    def reset_pipeline(self):
+        self.documents = None
+        self.index = None
         self.anomaly_data = {}
         self.conversation_state = "original_query"
-
 
     async def on_startup(self):
         from llama_index.embeddings.ollama import OllamaEmbedding
@@ -183,6 +187,8 @@ class Pipeline:
         self, user_message: str, model_id: str, messages: List[dict], body: dict
     ) -> Union[str, Generator, Iterator]:
 
+        result = ""
+
         if self.conversation_state != "finished":
             return self.handle_conversation(user_message)
 
@@ -254,6 +260,8 @@ class Pipeline:
             "💡 **Recommendation to solve the issue** 💡\n"
             f"{recommendation_text}\n"
         )
+
+        self.reset_pipeline()
 
         return result
 
