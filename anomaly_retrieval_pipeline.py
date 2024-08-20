@@ -145,39 +145,47 @@ class Pipeline:
 
     def process_user_response(self, user_input):
         user_input = user_input.strip()
-        if self.conversation_state == "start":
+
+        if self.conversation_state == "original_query":
             self.anomaly_data['original_query'] = user_input
-            self.conversation_state = "original_query"
-        elif self.conversation_state == "original_query":
             self.conversation_state = "ask_title"
+            return self.ask_next_question()
+        
         elif self.conversation_state == "ask_title":
             self.anomaly_data['title'] = user_input
             self.conversation_state = "ask_abstract"
+            return self.ask_next_question()
+        
         elif self.conversation_state == "ask_abstract":
             self.anomaly_data['abstract'] = user_input
             self.conversation_state = "ask_number"
+            return self.ask_next_question()
+        
         elif self.conversation_state == "ask_number":
             self.anomaly_data['number'] = user_input
             self.conversation_state = "ask_comment"
+            return self.ask_next_question()
+        
         elif self.conversation_state == "ask_comment":
             self.anomaly_data['comment'] = user_input
             self.conversation_state = "confirmation"
+            return self.ask_next_question()
+        
         elif self.conversation_state == "confirmation":
             if user_input.lower() in ["yes", "y"]:
                 self.conversation_state = "finished"
-                response = self.ask_next_question()
-                return response
+                return "Thanks ! let's start processing the anomaly data..."
             else:
                 self.conversation_state = "original_query"
                 self.anomaly_data = {}
-                return "Let's start again. Please provide the title of the new anomaly."
+                return "Oh no ! Let's start again. Please provide the title of the new anomaly."
+        
         else:
+            # Réinitialiser la conversation si l'état est inconnu
             self.anomaly_data = {}
             self.conversation_state = "original_query"
             return "Let's start again. Please provide the title of the new anomaly."
-       
 
-        return self.ask_next_question()
 
     def handle_conversation(self, user_input):
         return self.process_user_response(user_input)
