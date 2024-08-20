@@ -179,7 +179,11 @@ class Pipeline:
                 self.conversation_state = "ask_title"
                 self.anomaly_data = {}
                 return "Oh no ! Let's start again. Please provide the title of the new anomaly."
-        
+            
+        elif user_input == "reset":
+            self.reset_pipeline()
+            return "The conversation has been reset. Please provide the title of the new anomaly."
+
         else:
             # Réinitialiser la conversation si l'état est inconnu
             self.anomaly_data = {}
