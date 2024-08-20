@@ -126,11 +126,11 @@ class Pipeline:
         if self.conversation_state == "original_query":
             return "Welcome to the anomaly reporting system. Please provide the details of the anomaly you encountered"
         if self.conversation_state == "ask_title":
-            return "Ok Let's start ! Please provide the title of the anomaly."
+            return f"Ok Let's start ! Please provide the title of the anomaly. {self.conversation_state}"
         elif self.conversation_state == "ask_abstract":
-            return "Please provide a brief abstract of the anomaly."
+            return f"Please provide a brief abstract of the anomaly.{self.conversation_state}"
         elif self.conversation_state == "ask_number":
-            return "Now, Please provide the anomaly number."
+            return f"Now, Please provide the anomaly number. {self.conversation_state}"
         elif self.conversation_state == "ask_comment":
             return "Please provide any additional comments about the anomaly."
         elif self.conversation_state == "confirmation":
@@ -141,7 +141,7 @@ class Pipeline:
     def process_user_response(self, user_input):
         user_input = user_input.strip()
         print(f"State before processing: {self.conversation_state}, User input: {user_input}")
-    
+
         if self.conversation_state == "original_query":
             self.anomaly_data['original_query'] = user_input
             self.conversation_state = "ask_title"
