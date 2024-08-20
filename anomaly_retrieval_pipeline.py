@@ -39,7 +39,7 @@ class Pipeline:
         )
 
         openai.api_key = self.valves.OPENAI_API_KEY
-        self.conversation_state = "start"
+        self.conversation_state = "original_query"
         self.anomaly_data = {}
 
     async def on_startup(self):
@@ -140,8 +140,8 @@ class Pipeline:
 
     def process_user_response(self, user_input):
 
-        if self.conversation_state == "start":
-            self.anomaly_data['query'] = user_input
+        if self.conversation_state == "original_query":
+            self.anomaly_data['original_query'] = user_input
             self.conversation_state = "ask_title"
         elif self.conversation_state == "ask_title":
             self.anomaly_data['title'] = user_input
@@ -177,6 +177,7 @@ class Pipeline:
 
         # Assuming the user_message contains the problem description
         problem = {
+            'original_query': self.anomaly_data['original_query'],
             'title': self.anomaly_data['title'],
             'abstract': self.anomaly_data['abstract'],
             'number': self.anomaly_data['number'],
