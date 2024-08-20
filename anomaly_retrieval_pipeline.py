@@ -128,9 +128,9 @@ class Pipeline:
     
 
     def ask_next_question(self):
-        if self.conversation_state == "original_query":
+        if self.conversation_state == "start":
             return "Welcome to the anomaly reporting system. Please provide the title of the anomaly you encountered"
-        #elif self.conversation_state == "ask_title":
+        elif self.conversation_state == "ask_title":
             return "Ok let's start ! Please provide the title of the anomaly."
         elif self.conversation_state == "ask_abstract":
             return "Please provide a brief abstract of the anomaly."
@@ -147,11 +147,7 @@ class Pipeline:
         user_input = user_input.strip()
 
         if self.conversation_state == "start":
-            self.conversation_state = "original_query"
-            return self.ask_next_question()
-
-        elif self.conversation_state == "original_query":
-            self.anomaly_data['original_query'] = user_input
+            self.anomaly_data['start'] = user_input
             self.conversation_state = "ask_title"
             return self.ask_next_question()
         
@@ -180,14 +176,14 @@ class Pipeline:
                 self.conversation_state = "finished"
                 return "Thanks ! let's start processing the anomaly data..."
             else:
-                self.conversation_state = "start"
+                self.conversation_state = "ask_title"
                 self.anomaly_data = {}
                 return "Oh no ! Let's start again. Please provide the title of the new anomaly."
         
         else:
             # Réinitialiser la conversation si l'état est inconnu
             self.anomaly_data = {}
-            self.conversation_state = "start"
+            self.conversation_state = "ask_title"
             return "Let's start again. Please provide the title of the new anomaly."
 
 
@@ -206,7 +202,7 @@ class Pipeline:
 
         # Assuming the user_message contains the problem description
         problem = {
-            'original_query': self.anomaly_data['original_query'],
+            'start': self.anomaly_data['start'],
             'title': self.anomaly_data['title'],
             'abstract': self.anomaly_data['abstract'],
             'number': self.anomaly_data['number'],
