@@ -217,13 +217,13 @@ class Pipeline:
         
         # Step 5: Return the result
         result = (
-        "🛠 **Problem Details**\n"
+        "🛠 **Problem Details** 🛠\n"
         f"   - **Title**: {problem['title']}\n"
         f"   - **Abstract**: {problem['abstract']}\n"
         f"   - **Number**: {problem['number']}\n"
         f"   - **Comment**: {problem['comment']}\n\n"
         
-        "🔍 **Top 3 Similar Anomalies**\n"
+        "🔍 **Top 3 Similar Anomalies** 🔍\n"
         )
 
         for i, anomaly in enumerate(top3_anomalies, 1):
@@ -235,7 +235,7 @@ class Pipeline:
             )
 
         result += (
-            "💡 **Recommendation to solve the issue**\n"
+            "💡 **Recommendation to solve the issue**  💡\n"
             f"{recommendation_text}\n"
         )
 
