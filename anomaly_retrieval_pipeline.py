@@ -228,7 +228,6 @@ class Pipeline:
 
         # Assuming the user_message contains the problem description
         problem = {
-            'start': self.anomaly_data['start'],
             'title': self.anomaly_data['title'],
             'abstract': self.anomaly_data['abstract'],
             'number': self.anomaly_data['number'],
