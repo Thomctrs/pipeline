@@ -126,11 +126,11 @@ class Pipeline:
         if self.conversation_state == "original_query":
             return "Welcome to the anomaly reporting system. Please provide the details of the anomaly you encountered"
         if self.conversation_state == "ask_title":
-            return f"Ok let's start ! Please provide the title of the anomaly. {self.conversation_state}"
+            return "Ok Let's start ! Please provide the title of the anomaly."
         elif self.conversation_state == "ask_abstract":
-            return f"Please provide a brief abstract of the anomaly.{self.conversation_state}"
+            return "Please provide a brief abstract of the anomaly."
         elif self.conversation_state == "ask_number":
-            return f"Now, Please provide the anomaly number. {self.conversation_state}"
+            return "Now, Please provide the anomaly number."
         elif self.conversation_state == "ask_comment":
             return "Please provide any additional comments about the anomaly."
         elif self.conversation_state == "confirmation":
@@ -141,7 +141,7 @@ class Pipeline:
     def process_user_response(self, user_input):
         user_input = user_input.strip()
         print(f"State before processing: {self.conversation_state}, User input: {user_input}")
-
+    
         if self.conversation_state == "original_query":
             self.anomaly_data['original_query'] = user_input
             self.conversation_state = "ask_title"
@@ -177,6 +177,8 @@ class Pipeline:
         self, user_message: str, model_id: str, messages: List[dict], body: dict
     ) -> Union[str, Generator, Iterator]:
         
+        self.__init__()
+
         if self.conversation_state != "finished":
             return self.handle_conversation(user_message)
 
@@ -248,6 +250,8 @@ class Pipeline:
             "💡 **Recommendation to solve the issue** 💡\n"
             f"{recommendation_text}\n"
         )
+
+        self.__init__()
 
         return result
 
