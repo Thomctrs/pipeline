@@ -5,7 +5,6 @@ from sklearn.metrics.pairwise import cosine_similarity
 from langchain_community.embeddings import FastEmbedEmbeddings
 from langchain_community.chat_models import ChatOllama
 from pydantic import BaseModel
-from dotenv import load_dotenv
 import os
 
 class Pipeline:
