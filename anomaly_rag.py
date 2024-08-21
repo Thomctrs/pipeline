@@ -4,11 +4,6 @@ from neo4j import GraphDatabase
 from sklearn.metrics.pairwise import cosine_similarity
 from langchain_community.embeddings import FastEmbedEmbeddings
 from langchain_community.chat_models import ChatOllama
-from langchain_community.vectorstores import Chroma
-from langchain.schema.output_parser import StrOutputParser
-from langchain_community.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.vectorstores.utils import filter_complex_metadata
 from pydantic import BaseModel
 from dotenv import load_dotenv
 import os
