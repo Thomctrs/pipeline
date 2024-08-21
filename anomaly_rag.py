@@ -32,7 +32,7 @@ class Pipeline:
                 "OPENAI_API_KEY": os.getenv("OPENAI_API_KEY"),
             }
         )
-
+ 
     def reset_pipeline(self):
         self.documents = None
         self.index = None
