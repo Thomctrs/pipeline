@@ -81,7 +81,7 @@ class Pipeline:
             prompt += f"Anomaly {idx + 1}:\nTitle: {anomaly['title']}\nDescription: {anomaly['description']}\n\n"
         prompt += "Please provide a detailed recommendation to solve the user's problem based on the similarities with these anomalies."
 
-        response = self.llm.generate(prompt=prompt)
+        response = self.llm.invoke(prompt=prompt)
         return response.strip()
 
     def get_next_question(self) -> str:
