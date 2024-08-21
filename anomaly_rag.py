@@ -74,13 +74,22 @@ class Pipeline:
         return most_similar_indices, similarities[0]
 
     def generate_recommendation_text(self, similar_anomalies, problem):
-        prompt = f"The user has encountered a problem described as follows:\n\nTitle: {problem['title']}\nDescription: {problem['abstract']}\n\nBased on this problem, here are descriptions of 3 similar anomalies:\n\n"
+        prompt = (
+            f"The user has encountered a problem described as follows:\n\n"
+            f"Title: {problem['title']}\nDescription: {problem['abstract']}\n\n"
+            "Based on this problem, here are descriptions of 3 similar anomalies:\n\n"
+        )
         for idx, anomaly in enumerate(similar_anomalies):
-            prompt += f"Anomaly {idx + 1}:\nTitle: {anomaly['title']}\nDescription: {anomaly['description']}\n\n"
+            prompt += (
+                f"Anomaly {idx + 1}:\n"
+                f"Title: {anomaly['title']}\n"
+                f"Description: {anomaly['description']}\n\n"
+            )
         prompt += "Please provide a detailed recommendation to solve the user's problem based on the similarities with these anomalies."
 
-        response = self.llm.invoke(prompt=prompt)
+        response = self.llm.invoke(prompt=prompt)  
         return response.strip()
+
 
     def get_next_question(self) -> str:
         prompts = {
@@ -94,8 +103,9 @@ class Pipeline:
 
     def handle_llm_interaction(self, user_input: str) -> str:
         prompt = f"{self.get_next_question()}\nUser Response: {user_input}\n\nWhat should be the next question or action?"
-        response = self.generate(prompt=prompt)
+        response = self.llm.invoke(prompt=prompt)  # Utilisez 'invoke' ou 'generate' selon ce qui est correct
         return response.strip()
+
  
     def process_user_response(self, user_input: str) -> str:
         if self.conversation_state == "confirmation":
@@ -163,7 +173,7 @@ class Pipeline:
             f"   - **Abstract**: {problem['abstract']}\n"
             f"   - **Number**: {problem['number']}\n"
             f"   - **Comment**: {problem['comment']}\n\n"
-            "🔍 **Top 3 Similar Anomalies** 🔍\n"
+            "🔍 **Tojp 3 Similar Anomalies** 🔍\n"
         )
 
         for i, anomaly in enumerate(top3_anomalies, 1):
