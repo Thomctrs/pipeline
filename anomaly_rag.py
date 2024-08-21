@@ -22,7 +22,7 @@ class Pipeline:
         self.reset_pipeline()
         load_dotenv()
         self.valves = self.Valves(
-            **{
+            **{ 
                 "LLAMAINDEX_OLLAMA_BASE_URL": os.getenv("LLAMAINDEX_OLLAMA_BASE_URL", "http://localhost:11434"),
                 "LLAMAINDEX_MODEL_NAME": os.getenv("LLAMAINDEX_MODEL_NAME"),
                 "LLAMAINDEX_EMBEDDING_MODEL_NAME": os.getenv("LLAMAINDEX_EMBEDDING_MODEL_NAME"),
@@ -37,7 +37,7 @@ class Pipeline:
         self.documents = None
         self.index = None
         self.anomaly_data = {}
-        self.conversation_state = "start"
+        self.conversation_state = "start" 
 
     async def on_startup(self):
         self.embedding_model = FastEmbedEmbeddings(model_name=self.valves.LLAMAINDEX_EMBEDDING_MODEL_NAME)
@@ -136,7 +136,7 @@ class Pipeline:
         # Clean the data
         cleaned_anomaly_data = self.clean_text(data)
         if not cleaned_anomaly_data:
-            return "No valid anomaly data found after cleaning."
+            return "No valid anomaly data found after cleaning. Please try again."
 
         combined_texts = [f"{item['title']} {item['description']}" for item in cleaned_anomaly_data]
         anomaly_embeddings = self.compute_embeddings_for_combined_texts(combined_texts)
