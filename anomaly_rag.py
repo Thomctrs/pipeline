@@ -2,11 +2,15 @@ from typing import List, Dict, Union
 import numpy as np
 from neo4j import GraphDatabase
 from sklearn.metrics.pairwise import cosine_similarity
-from llama_index.embeddings.ollama import OllamaEmbedding
-from llama_index.llms.ollama import Ollama
+from langchain_community.embeddings import FastEmbedEmbeddings
+from langchain_community.chat_models import ChatOllama
+from langchain_community.vectorstores import Chroma
+from langchain.schema.output_parser import StrOutputParser
+from langchain_community.document_loaders import PyPDFLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.vectorstores.utils import filter_complex_metadata
 from pydantic import BaseModel
 from dotenv import load_dotenv
-import openai
 import os
 
 class Pipeline:
@@ -33,7 +37,6 @@ class Pipeline:
                 "OPENAI_API_KEY": os.getenv("OPENAI_API_KEY"),
             }
         )
-        openai.api_key = self.valves.OPENAI_API_KEY
 
     def reset_pipeline(self):
         self.documents = None
@@ -42,14 +45,8 @@ class Pipeline:
         self.conversation_state = "start"
 
     async def on_startup(self):
-        self.embedding_model = OllamaEmbedding(
-            model_name=self.valves.LLAMAINDEX_EMBEDDING_MODEL_NAME,
-            base_url=self.valves.LLAMAINDEX_OLLAMA_BASE_URL,
-        )
-        self.llm = Ollama(
-            model=self.valves.LLAMAINDEX_MODEL_NAME,
-            base_url=self.valves.LLAMAINDEX_OLLAMA_BASE_URL,
-        )
+        self.embedding_model = FastEmbedEmbeddings()
+        self.llm = ChatOllama(model_name=self.valves.LLAMAINDEX_MODEL_NAME)
 
     async def on_shutdown(self):
         pass
@@ -89,10 +86,7 @@ class Pipeline:
             prompt += f"Anomaly {idx + 1}:\nTitle: {anomaly['title']}\nDescription: {anomaly['description']}\n\n"
         prompt += "Please provide a detailed recommendation to solve the user's problem based on the similarities with these anomalies."
 
-        response = self.llm.generate(
-            prompt=prompt,
-            model=self.valves.LLAMAINDEX_MODEL_NAME
-        )
+        response = self.llm.generate(prompt=prompt)
         return response.strip()
 
     def get_next_question(self) -> str:
@@ -107,10 +101,7 @@ class Pipeline:
 
     def handle_llm_interaction(self, user_input: str) -> str:
         prompt = f"{self.get_next_question()}\nUser Response: {user_input}\n\nWhat should be the next question or action?"
-        response = self.llm.generate(
-            prompt=prompt,
-            model=self.valves.LLAMAINDEX_MODEL_NAME
-        )
+        response = self.llm.generate(prompt=prompt)
         return response.strip()
 
     def process_user_response(self, user_input: str) -> str:
@@ -129,7 +120,7 @@ class Pipeline:
 
         return self.handle_llm_interaction(user_input)
 
-    def pipe(self, user_message: str, model_id: str, messages: List[Dict], body: Dict) -> Union[str, Generator]:
+    def pipe(self, user_message: str, model_id: str, messages: List[Dict], body: Dict) -> Union[str, None]:
         if self.conversation_state != "finished":
             return self.process_user_response(user_message)
 
