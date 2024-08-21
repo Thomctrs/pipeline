@@ -89,13 +89,11 @@ class Pipeline:
             prompt += f"Anomaly {idx + 1}:\nTitle: {anomaly['title']}\nDescription: {anomaly['description']}\n\n"
         prompt += "Please provide a detailed recommendation to solve the user's problem based on the similarities with these anomalies."
 
-        response = self.llm.chat(
-            messages=[
-                {"role": "system", "content": "You are an expert at providing solutions for software anomalies."},
-                {"role": "user", "content": prompt}
-            ]
+        response = self.llm.generate(
+            prompt=prompt,
+            model=self.valves.LLAMAINDEX_MODEL_NAME
         )
-        return response['choices'][0]['message']['content'].strip()
+        return response.strip()
 
     def get_next_question(self) -> str:
         prompts = {
@@ -109,13 +107,11 @@ class Pipeline:
 
     def handle_llm_interaction(self, user_input: str) -> str:
         prompt = f"{self.get_next_question()}\nUser Response: {user_input}\n\nWhat should be the next question or action?"
-        response = self.llm.chat(
-            messages=[
-                {"role": "system", "content": "You are an expert guiding users through the anomaly reporting process."},
-                {"role": "user", "content": prompt}
-            ]
+        response = self.llm.generate(
+            prompt=prompt,
+            model=self.valves.LLAMAINDEX_MODEL_NAME
         )
-        return response['choices'][0]['message']['content'].strip()
+        return response.strip()
 
     def process_user_response(self, user_input: str) -> str:
         if self.conversation_state == "confirmation":
