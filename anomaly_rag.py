@@ -40,7 +40,7 @@ class Pipeline:
         self.conversation_state = "start"
 
     async def on_startup(self):
-        self.embedding_model = FastEmbedEmbeddings()
+        self.embedding_model = FastEmbedEmbeddings(model_name=self.valves.LLAMAINDEX_EMBEDDING_MODEL_NAME)
         self.llm = ChatOllama(model_name=self.valves.LLAMAINDEX_MODEL_NAME)
 
     async def on_shutdown(self):
