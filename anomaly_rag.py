@@ -19,7 +19,6 @@ class Pipeline:
 
     def __init__(self):
         self.reset_pipeline()
-        load_dotenv()
         self.valves = self.Valves(
             **{ 
                 "LLAMAINDEX_OLLAMA_BASE_URL": os.getenv("LLAMAINDEX_OLLAMA_BASE_URL", "http://localhost:11434"),
