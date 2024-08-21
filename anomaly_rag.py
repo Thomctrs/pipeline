@@ -98,7 +98,7 @@ class Pipeline:
         prompt = f"{self.get_next_question()}\nUser Response: {user_input}\n\nWhat should be the next question or action?"
         response = self.llm.generate(prompt=prompt)
         return response.strip()
-
+ 
     def process_user_response(self, user_input: str) -> str:
         if self.conversation_state == "confirmation":
             if user_input.lower() in ["yes", "y"]:
