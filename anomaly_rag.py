@@ -1,4 +1,4 @@
-from typing import List, Dict, Union, Generator
+from typing import List, Dict, Union
 import numpy as np
 from neo4j import GraphDatabase
 from sklearn.metrics.pairwise import cosine_similarity
@@ -40,7 +40,6 @@ class Pipeline:
         self.index = None
         self.anomaly_data = {}
         self.conversation_state = "start"
-        self.llm_response = ""
 
     async def on_startup(self):
         self.embedding_model = OllamaEmbedding(
@@ -90,8 +89,13 @@ class Pipeline:
             prompt += f"Anomaly {idx + 1}:\nTitle: {anomaly['title']}\nDescription: {anomaly['description']}\n\n"
         prompt += "Please provide a detailed recommendation to solve the user's problem based on the similarities with these anomalies."
 
-        response = self.llm.generate(prompt)
-        return response["choices"][0]["text"].strip()
+        response = self.llm.chat(
+            messages=[
+                {"role": "system", "content": "You are an expert at providing solutions for software anomalies."},
+                {"role": "user", "content": prompt}
+            ]
+        )
+        return response['choices'][0]['message']['content'].strip()
 
     def get_next_question(self) -> str:
         prompts = {
@@ -105,8 +109,13 @@ class Pipeline:
 
     def handle_llm_interaction(self, user_input: str) -> str:
         prompt = f"{self.get_next_question()}\nUser Response: {user_input}\n\nWhat should be the next question or action?"
-        response = self.llm.generate(prompt)
-        return response["choices"][0]["text"].strip()
+        response = self.llm.chat(
+            messages=[
+                {"role": "system", "content": "You are an expert guiding users through the anomaly reporting process."},
+                {"role": "user", "content": prompt}
+            ]
+        )
+        return response['choices'][0]['message']['content'].strip()
 
     def process_user_response(self, user_input: str) -> str:
         if self.conversation_state == "confirmation":
@@ -171,10 +180,9 @@ class Pipeline:
         result = (
             "🛠 **Problem Details** 🛠\n"
             f"   - **Title**: {problem['title']}\n"
-            f"   - **Description**: {problem['abstract']}\n"
+            f"   - **Abstract**: {problem['abstract']}\n"
             f"   - **Number**: {problem['number']}\n"
             f"   - **Comment**: {problem['comment']}\n\n"
-            
             "🔍 **Top 3 Similar Anomalies** 🔍\n"
         )
 
@@ -192,7 +200,6 @@ class Pipeline:
         )
 
         self.reset_pipeline()
-
         return result
 
     class AnomalyRetrievalAndRecommendationPipeline:
