@@ -50,6 +50,11 @@ class Pipeline:
             base_url=self.valves.LLAMAINDEX_OLLAMA_BASE_URL,
         )
 
+        self.embed_model = OllamaEmbedding(
+            model_name=self.valves.LLAMAINDEX_EMBEDDING_MODEL_NAME,
+            base_url=self.valves.LLAMAINDEX_OLLAMA_BASE_URL,
+        )
+
         global documents, index
         pass
         
@@ -80,10 +85,13 @@ class Pipeline:
         return [item for item in data if isinstance(item['description'], str) and isinstance(item['title'], str)]
 
     def compute_embeddings_for_combined_texts(self, texts):
+        # Génère les embeddings pour une liste de textes
         embeddings = [self.embed_model.embed(text) for text in texts]
-        return np.array(embeddings)
+        embeddings = np.array(embeddings)
+        return embeddings
 
     def recalculate_embeddings_for_test_anomalies(self, test_anomaly_title, test_anomaly_description):
+        # Combine le titre et la description et génère l'embedding pour ce texte
         combined_text = f"{test_anomaly_title} {test_anomaly_description}"
         test_embedding = self.embed_model.embed(combined_text)
         return np.array([test_embedding])
