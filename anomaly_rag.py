@@ -2,6 +2,7 @@ from typing import List, Dict, Union
 import numpy as np
 from neo4j import GraphDatabase
 from sklearn.metrics.pairwise import cosine_similarity
+from llama_index.core.data_structs.node import Node
 from pydantic import BaseModel
 import os
 import re
@@ -85,15 +86,18 @@ class Pipeline:
         return [item for item in data if isinstance(item['description'], str) and isinstance(item['title'], str)]
 
     def compute_embeddings_for_combined_texts(self, texts):
-        # Génère les embeddings pour une liste de textes
-        embeddings = [self.embed_model(text) for text in texts]
+        # Convertir les textes en objets Node
+        nodes = [Node(text) for text in texts]
+        # Génère les embeddings pour chaque Node
+        embeddings = [self.embed_model(node) for node in nodes]
         embeddings = np.array(embeddings)
         return embeddings
 
     def recalculate_embeddings_for_test_anomalies(self, test_anomaly_title, test_anomaly_description):
-        # Combine le titre et la description et génère l'embedding pour ce texte
+        # Combine le titre et la description, puis crée un Node pour ce texte
         combined_text = f"{test_anomaly_title} {test_anomaly_description}"
-        test_embedding = self.embed_model(combined_text)
+        node = Node(combined_text)
+        test_embedding = self.embed_model(node)
         return np.array([test_embedding])
 
     def get_most_similar_anomalies(self, test_anomaly_embedding, anomaly_embeddings):
