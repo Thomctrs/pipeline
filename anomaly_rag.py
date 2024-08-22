@@ -105,72 +105,87 @@ class Pipeline:
 
         return response.text  # Adjusted to return the text response
     
-    
-    def get_next_question(self) -> str:
-        prompts = {
-            "start": "Welcome to the anomaly reporting system. Please provide the title of the anomaly you encountered.",
-            "ask_title": "Thank you! Can you now provide a brief description of the anomaly?",
-            "ask_abstract": "Got it. Now, please provide the anomaly number.",
-            "ask_number": "Thanks. Finally, do you have any additional comments or details about the anomaly?",
-            "ask_comment": ("We have gathered all the necessary information. "
-                            "Do you want to confirm the details?\n\n"
-                            "Title: {title}\n"
-                            "Description: {abstract}\n"
-                            "Number: {number}\n"
-                            "Comment: {comment}\n\n"
-                            "Is this information correct? (yes/no)")
-        }
-        # Remplacer les placeholders par les données actuelles
-        return prompts.get(self.conversation_state, "Thank you for using our system. Please restart the process if you need to.").format(**self.anomaly_data)
 
-    def handle_llm_interaction(self, user_input: str) -> str:
-        from langchain.llms import OpenAI
-        from llama_index.llms.langchain import LangChainLLM
-
-        # Met à jour les données d'anomalie selon l'état de la conversation
+    def ask_next_question(self):
         if self.conversation_state == "start":
-            self.anomaly_data['title'] = user_input
-            self.conversation_state = "ask_title"
+            return "Welcome to the anomaly reporting system. Please provide the title of the anomaly you encountered"
         elif self.conversation_state == "ask_title":
-            self.anomaly_data['abstract'] = user_input
-            self.conversation_state = "ask_abstract"
+            return "Ok let's start ! Please provide the title of the anomaly."
         elif self.conversation_state == "ask_abstract":
-            self.anomaly_data['number'] = user_input
-            self.conversation_state = "ask_number"
+            return "Please provide a brief abstract of the anomaly."
         elif self.conversation_state == "ask_number":
-            self.anomaly_data['comment'] = user_input
-            self.conversation_state = "ask_comment"
+            return "Now, Please provide the anomaly number."
         elif self.conversation_state == "ask_comment":
-            if user_input.lower() == "yes":
-                self.conversation_state = "confirmation"
-                return "Thank you! Your anomaly report has been submitted successfully."
-            else:
-                self.conversation_state = "start"
-                return "Let's start over. Please provide the title of the anomaly you encountered."
+            return "Please provide any additional comments about the anomaly."
+        elif self.conversation_state == "confirmation":
+            return f"Here is the summary of the anomaly:\n\nTitle: {self.anomaly_data['title']}\nAbstract: {self.anomaly_data['abstract']}\nNumber: {self.anomaly_data['number']}\nComment: {self.anomaly_data['comment']}\n\nIs this information correct? (yes/no)"
+        else:
+            return "Thanks for using our pipeline. Please enter a whitespace to start again."
 
-        # Générer la prochaine question
-        prompt = self.get_next_question()
-        llm = LangChainLLM(llm=OpenAI())
-        response = llm.complete(prompt=prompt)
+    def process_user_response(self, user_input):
+
+        new_title = self.extract_title_from_prompt(user_input)
+        if new_title:
+            self.anomaly_data['title'] = new_title
+            self.conversation_state = "ask_title"  
+            return self.ask_next_question()
         
-        return response.text  # Retourne le texte généré par le modèle
+        user_input = user_input.strip()
 
-    def process_user_response(self, user_input: str) -> str:
-        if self.conversation_state == "confirmation":
+        if self.conversation_state == "start" and user_input != "reset":
+            self.anomaly_data['start'] = user_input
+            self.conversation_state = "first_query"
+            return self.ask_next_question()
+        
+        elif self.conversation_state == "first_query" and user_input != "reset":
+            self.anomaly_data['first_query'] = user_input
+            self.conversation_state = "ask_title"
+            return self.ask_next_question()
+        
+        elif self.conversation_state == "ask_title" and user_input != "reset":
+            self.anomaly_data['title'] = user_input
+            self.conversation_state = "ask_abstract"
+            return self.ask_next_question()
+        
+        elif self.conversation_state == "ask_abstract" and user_input != "reset":
+            self.anomaly_data['abstract'] = user_input
+            self.conversation_state = "ask_number"
+            return self.ask_next_question()
+        
+        elif self.conversation_state == "ask_number" and user_input != "reset":
+            self.anomaly_data['number'] = user_input
+            self.conversation_state = "ask_comment"
+            return self.ask_next_question()
+        
+        elif self.conversation_state == "ask_comment" and user_input != "reset":
+            self.anomaly_data['comment'] = user_input
+            self.conversation_state = "confirmation"
+            return self.ask_next_question()
+        
+        elif self.conversation_state == "confirmation" and user_input != "reset":
             if user_input.lower() in ["yes", "y"]:
                 self.conversation_state = "finished"
-                return "Thanks! Processing the anomaly data."
+                return "Thanks ! let's start processing the anomaly data. Please enter to proceed."
             else:
                 self.conversation_state = "ask_title"
                 self.anomaly_data = {}
-                return "It seems there was an issue. Let's start over. Please provide the title of the anomaly."
-
-        if user_input.lower() in ["reset"]:
+                return "Oh no ! Let's start again. Please provide the title of the new anomaly."
+            
+        elif user_input == "reset":
             self.reset_pipeline()
-            return "The conversation has been reset. Please provide the title of the anomaly to start over."
+            user_input = ""
+            return "The conversation has been reset."
 
-        return self.handle_llm_interaction(user_input)
+        else:
+            # Réinitialiser la conversation si l'état est inconnu
+            self.anomaly_data = {}
+            self.conversation_state = "ask_title"
+            return "Let's start again. Please provide the title of the new anomaly."
 
+
+    def handle_conversation(self, user_input):
+        return self.process_user_response(user_input)
+    
     def pipe(self, user_message: str, model_id: str, messages: List[Dict], body: Dict) -> Union[str, None]:
         if self.conversation_state != "finished":
             return self.process_user_response(user_message)
@@ -221,7 +236,7 @@ class Pipeline:
             f"   - **Abstract**: {problem['abstract']}\n"
             f"   - **Number**: {problem['number']}\n"
             f"   - **Comment**: {problem['comment']}\n\n"
-            "🔍 **Tojp 3 Similar Anomalies** 🔍\n"
+            "🔍 **Top 3 Similar Anomalies** 🔍\n"
         )
 
         for i, anomaly in enumerate(top3_anomalies, 1):
