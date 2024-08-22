@@ -119,7 +119,7 @@ class Pipeline:
 
     def handle_llm_interaction(self, user_input: str) -> str:
         prompt = f"{self.get_next_question()}\nUser Response: {user_input}\n\nWhat should be the next question or action?"
-        response = self.llm.invoke(prompt=prompt)  # Utilisez 'invoke' ou 'generate' selon ce qui est correct
+        response = self.invoke(prompt=prompt)  # Utilisez 'invoke' ou 'generate' selon ce qui est correct
         return response.strip()
 
  
