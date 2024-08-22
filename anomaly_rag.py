@@ -2,8 +2,6 @@ from typing import List, Dict, Union
 import numpy as np
 from neo4j import GraphDatabase
 from sklearn.metrics.pairwise import cosine_similarity
-from langchain_community.embeddings import FastEmbedEmbeddings
-from langchain_community.chat_models import ChatOllama
 from pydantic import BaseModel
 import os
 
@@ -29,7 +27,7 @@ class Pipeline:
                 "NEO4J_PASSWORD": os.getenv("NEO4J_PASSWORD", "password"),
                 "OPENAI_API_KEY": os.getenv("OPENAI_API_KEY"),
             }
-        )
+        ) 
  
     def reset_pipeline(self):
         self.documents = None
