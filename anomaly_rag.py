@@ -36,7 +36,6 @@ class Pipeline:
         self.conversation_state = "start" 
 
     async def on_startup(self):
-
         from llama_index.embeddings.ollama import OllamaEmbedding
         from llama_index.llms.ollama import Ollama
         from llama_index.core import Settings, VectorStoreIndex, SimpleDirectoryReader
@@ -51,13 +50,8 @@ class Pipeline:
         )
 
         global documents, index
-
-        # Optionally, load documents if needed for LlamaIndex
-        #self.documents = SimpleDirectoryReader("/app/backend/data").load_data()
-        #self.index = VectorStoreIndex.from_documents(self.documents)
         pass
         
-
     async def on_shutdown(self):
         pass
 
@@ -107,10 +101,9 @@ class Pipeline:
         from langchain.llms import OpenAI
         from llama_index.llms.langchain import LangChainLLM
         llm = LangChainLLM(llm=OpenAI())
-        response = llm.stream_complete(prompt=prompt)  
+        response = llm.generate(prompt=prompt)  # Changed to use 'generate' instead of 'stream_complete'
 
-        return response
-
+        return response.text  # Adjusted to return the text response
 
     def get_next_question(self) -> str:
         prompts = {
@@ -128,10 +121,9 @@ class Pipeline:
 
         llm = LangChainLLM(llm=OpenAI())
         prompt = f"{self.get_next_question()}\nUser Response: {user_input}\n\nWhat should be the next question or action?"
-        response = llm.stream_complete(prompt=prompt)  # Utilisez 'invoke' ou 'generate' selon ce qui est correct
-        return response # comment
+        response = llm.generate(prompt=prompt)  # Changed to use 'generate' instead of 'stream_complete'
+        return response.text  # Return the generated text
 
- 
     def process_user_response(self, user_input: str) -> str:
         if self.conversation_state == "confirmation":
             if user_input.lower() in ["yes", "y"]:
