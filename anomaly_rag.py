@@ -125,10 +125,11 @@ class Pipeline:
     def handle_llm_interaction(self, user_input: str) -> str:
         from langchain.llms import OpenAI
         from llama_index.llms.langchain import LangChainLLM
+
         llm = LangChainLLM(llm=OpenAI())
         prompt = f"{self.get_next_question()}\nUser Response: {user_input}\n\nWhat should be the next question or action?"
         response = llm.stream_complete(prompt=prompt)  # Utilisez 'invoke' ou 'generate' selon ce qui est correct
-        return response
+        return response # comment
 
  
     def process_user_response(self, user_input: str) -> str:
