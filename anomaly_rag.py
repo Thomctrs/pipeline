@@ -48,6 +48,7 @@ class Pipeline:
             model=self.valves.LLAMAINDEX_MODEL_NAME
         )
 
+
         global documents, index
 
         # Optionally, load documents if needed for LlamaIndex
@@ -101,8 +102,12 @@ class Pipeline:
                 f"Description: {anomaly['description']}\n\n"
             )
         prompt += "Please provide a detailed recommendation to solve the user's problem based on the similarities with these anomalies."
-
-        response = self.llm.invoke(prompt=prompt)  
+        
+        from langchain.llms import OpenAI
+        from llama_index.llms.langchain import LangChainLLM
+        llm = LangChainLLM(llm=OpenAI())
+        response = llm.stream_complete(prompt=prompt)  
+        
         return response.strip()
 
 
@@ -117,8 +122,11 @@ class Pipeline:
         return prompts.get(self.conversation_state, "Thank you for using our system. Please restart the process if you need to.")
 
     def handle_llm_interaction(self, user_input: str) -> str:
+        from langchain.llms import OpenAI
+        from llama_index.llms.langchain import LangChainLLM
+        llm = LangChainLLM(llm=OpenAI())
         prompt = f"{self.get_next_question()}\nUser Response: {user_input}\n\nWhat should be the next question or action?"
-        response = self.llm.invoke(prompt=prompt)  # Utilisez 'invoke' ou 'generate' selon ce qui est correct
+        response = llm.stream_complete(prompt=prompt)  # Utilisez 'invoke' ou 'generate' selon ce qui est correct
         return response.strip()
 
  
