@@ -104,25 +104,56 @@ class Pipeline:
         response = llm.complete(prompt=prompt)  # Changed to use 'generate' instead of 'stream_complete'
 
         return response.text  # Adjusted to return the text response
-
+    
+    
     def get_next_question(self) -> str:
         prompts = {
             "start": "Welcome to the anomaly reporting system. Please provide the title of the anomaly you encountered.",
             "ask_title": "Thank you! Can you now provide a brief description of the anomaly?",
             "ask_abstract": "Got it. Now, please provide the anomaly number.",
             "ask_number": "Thanks. Finally, do you have any additional comments or details about the anomaly?",
-            "ask_comment": "We have gathered all the necessary information. Do you want to confirm the details?\n\nTitle: {self.anomaly_data.get('title')}\nDescription: {self.anomaly_data.get('abstract')}\nNumber: {self.anomaly_data.get('number')}\nComment: {self.anomaly_data.get('comment')}\n\nIs this information correct? (yes/no)"
+            "ask_comment": ("We have gathered all the necessary information. "
+                            "Do you want to confirm the details?\n\n"
+                            "Title: {title}\n"
+                            "Description: {abstract}\n"
+                            "Number: {number}\n"
+                            "Comment: {comment}\n\n"
+                            "Is this information correct? (yes/no)")
         }
-        return prompts.get(self.conversation_state, "Thank you for using our system. Please restart the process if you need to.")
+        # Remplacer les placeholders par les données actuelles
+        return prompts.get(self.conversation_state, "Thank you for using our system. Please restart the process if you need to.").format(**self.anomaly_data)
 
     def handle_llm_interaction(self, user_input: str) -> str:
         from langchain.llms import OpenAI
         from llama_index.llms.langchain import LangChainLLM
 
+        # Met à jour les données d'anomalie selon l'état de la conversation
+        if self.conversation_state == "start":
+            self.anomaly_data['title'] = user_input
+            self.conversation_state = "ask_title"
+        elif self.conversation_state == "ask_title":
+            self.anomaly_data['abstract'] = user_input
+            self.conversation_state = "ask_abstract"
+        elif self.conversation_state == "ask_abstract":
+            self.anomaly_data['number'] = user_input
+            self.conversation_state = "ask_number"
+        elif self.conversation_state == "ask_number":
+            self.anomaly_data['comment'] = user_input
+            self.conversation_state = "ask_comment"
+        elif self.conversation_state == "ask_comment":
+            if user_input.lower() == "yes":
+                self.conversation_state = "confirmation"
+                return "Thank you! Your anomaly report has been submitted successfully."
+            else:
+                self.conversation_state = "start"
+                return "Let's start over. Please provide the title of the anomaly you encountered."
+
+        # Générer la prochaine question
+        prompt = self.get_next_question()
         llm = LangChainLLM(llm=OpenAI())
-        prompt = f"{self.get_next_question()}\nUser Response: {user_input}\n\nGo to the next prompt."
-        response = llm.complete(prompt=prompt)  # Changed to use 'generate' instead of 'stream_complete'
-        return response.text  # Return the generated text
+        response = llm.complete(prompt=prompt)
+        
+        return response.text  # Retourne le texte généré par le modèle
 
     def process_user_response(self, user_input: str) -> str:
         if self.conversation_state == "confirmation":
