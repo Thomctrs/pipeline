@@ -36,17 +36,20 @@ class Pipeline:
         self.conversation_state = "start" 
 
     async def on_startup(self):
+        
         from llama_index.embeddings.ollama import OllamaEmbedding
-        from langchain_community.chat_models import ChatOllama
+        from llama_index.llms.ollama import Ollama
         from llama_index.core import Settings, VectorStoreIndex, SimpleDirectoryReader
 
         Settings.embed_model = OllamaEmbedding(
             model_name=self.valves.LLAMAINDEX_EMBEDDING_MODEL_NAME,
             base_url=self.valves.LLAMAINDEX_OLLAMA_BASE_URL,
         )
-        Settings.llm = ChatOllama(
-            model=self.valves.LLAMAINDEX_MODEL_NAME
+        Settings.llm = Ollama(
+            model=self.valves.LLAMAINDEX_MODEL_NAME,
+            base_url=self.valves.LLAMAINDEX_OLLAMA_BASE_URL,
         )
+
 
 
         global documents, index
@@ -107,7 +110,7 @@ class Pipeline:
         from llama_index.llms.langchain import LangChainLLM
         llm = LangChainLLM(llm=OpenAI())
         response = llm.stream_complete(prompt=prompt)  
-        
+
         return response.strip()
 
 
