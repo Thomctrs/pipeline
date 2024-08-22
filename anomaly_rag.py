@@ -101,7 +101,7 @@ class Pipeline:
         from langchain.llms import OpenAI
         from llama_index.llms.langchain import LangChainLLM
         llm = LangChainLLM(llm=OpenAI())
-        response = llm.generate(prompt=prompt)  # Changed to use 'generate' instead of 'stream_complete'
+        response = llm.complete(prompt=prompt)  # Changed to use 'generate' instead of 'stream_complete'
 
         return response.text  # Adjusted to return the text response
 
@@ -121,7 +121,7 @@ class Pipeline:
 
         llm = LangChainLLM(llm=OpenAI())
         prompt = f"{self.get_next_question()}\nUser Response: {user_input}\n\nWhat should be the next question or action?"
-        response = llm.generate(prompt=prompt)  # Changed to use 'generate' instead of 'stream_complete'
+        response = llm.complete(prompt=prompt)  # Changed to use 'generate' instead of 'stream_complete'
         return response.text  # Return the generated text
 
     def process_user_response(self, user_input: str) -> str:
