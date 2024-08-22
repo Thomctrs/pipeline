@@ -133,7 +133,7 @@ class Pipeline:
 
     def process_user_response(self, user_input):
 
-        new_title = self.extract_title_from_prompt(user_input)
+        new_title = self.extract_title_from_prompt(user_input) # Extract title from prompt
         if new_title:
             self.anomaly_data['title'] = new_title
             self.conversation_state = "ask_title"  
