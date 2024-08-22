@@ -4,6 +4,7 @@ from neo4j import GraphDatabase
 from sklearn.metrics.pairwise import cosine_similarity
 from pydantic import BaseModel
 import os
+import re
 
 class Pipeline:
     class Valves(BaseModel):
@@ -57,6 +58,14 @@ class Pipeline:
 
     def neo4j_connection(self):
         return GraphDatabase.driver(self.valves.NEO4J_URI, auth=(self.valves.NEO4J_USER, self.valves.NEO4J_PASSWORD))
+
+    def extract_title_from_prompt(self, user_input: str) -> str:
+        # Utilise une expression régulière pour extraire la partie après "here is the title of my anomaly: "
+        match = re.search(r"the title of my anomaly: (.+)", user_input, re.IGNORECASE)
+        if match:
+            return match.group(1).strip()
+        else:
+            return None
 
     def get_anomalies(self, driver):
         query = """
