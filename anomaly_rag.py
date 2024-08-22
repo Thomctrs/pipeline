@@ -80,12 +80,12 @@ class Pipeline:
         return [item for item in data if isinstance(item['description'], str) and isinstance(item['title'], str)]
 
     def compute_embeddings_for_combined_texts(self, texts):
-        embeddings = [self.embedding_model.embed(text) for text in texts]
+        embeddings = [self.embed_model.embed(text) for text in texts]
         return np.array(embeddings)
 
     def recalculate_embeddings_for_test_anomalies(self, test_anomaly_title, test_anomaly_description):
         combined_text = f"{test_anomaly_title} {test_anomaly_description}"
-        test_embedding = self.embedding_model.embed(combined_text)
+        test_embedding = self.embed_model.embed(combined_text)
         return np.array([test_embedding])
 
     def get_most_similar_anomalies(self, test_anomaly_embedding, anomaly_embeddings):
