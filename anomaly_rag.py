@@ -22,8 +22,8 @@ class Pipeline:
         self.valves = self.Valves(
             **{ 
                 "LLAMAINDEX_OLLAMA_BASE_URL": os.getenv("LLAMAINDEX_OLLAMA_BASE_URL", "http://localhost:11434"),
-                "LLAMAINDEX_MODEL_NAME": os.getenv("LLAMAINDEX_MODEL_NAME"),
-                "LLAMAINDEX_EMBEDDING_MODEL_NAME": os.getenv("LLAMAINDEX_EMBEDDING_MODEL_NAME", 'BAAI/bge-base-en'),
+                "LLAMAINDEX_MODEL_NAME": os.getenv("LLAMAINDEX_MODEL_NAME", "llama3_8b"),
+                "LLAMAINDEX_EMBEDDING_MODEL_NAME": os.getenv("LLAMAINDEX_EMBEDDING_MODEL_NAME", 'nomic-embed-text'),
                 "NEO4J_URI": os.getenv("NEO4J_URI", "bolt://localhost:7687"),
                 "NEO4J_USER": os.getenv("NEO4J_USER", "neo4j"),
                 "NEO4J_PASSWORD": os.getenv("NEO4J_PASSWORD", "password"),
@@ -38,8 +38,26 @@ class Pipeline:
         self.conversation_state = "start" 
 
     async def on_startup(self):
-        self.embedding_model = FastEmbedEmbeddings(model_name=self.valves.LLAMAINDEX_EMBEDDING_MODEL_NAME)
-        self.llm = ChatOllama(model_name=self.valves.LLAMAINDEX_MODEL_NAME)
+        from llama_index.embeddings.ollama import OllamaEmbedding
+        from langchain_community.chat_models import ChatOllama
+        from llama_index.core import Settings, VectorStoreIndex, SimpleDirectoryReader
+
+        Settings.embed_model = OllamaEmbedding(
+            model_name=self.valves.LLAMAINDEX_EMBEDDING_MODEL_NAME,
+            base_url=self.valves.LLAMAINDEX_OLLAMA_BASE_URL,
+        )
+        Settings.llm = ChatOllama(
+            model=self.valves.LLAMAINDEX_MODEL_NAME,
+            base_url=self.valves.LLAMAINDEX_OLLAMA_BASE_URL,
+        )
+
+        global documents, index
+
+        # Optionally, load documents if needed for LlamaIndex
+        #self.documents = SimpleDirectoryReader("/app/backend/data").load_data()
+        #self.index = VectorStoreIndex.from_documents(self.documents)
+        pass
+        
 
     async def on_shutdown(self):
         pass
