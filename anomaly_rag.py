@@ -109,7 +109,7 @@ class Pipeline:
         llm = LangChainLLM(llm=OpenAI())
         response = llm.stream_complete(prompt=prompt)  
 
-        return response.strip()
+        return response
 
 
     def get_next_question(self) -> str:
@@ -128,7 +128,7 @@ class Pipeline:
         llm = LangChainLLM(llm=OpenAI())
         prompt = f"{self.get_next_question()}\nUser Response: {user_input}\n\nWhat should be the next question or action?"
         response = llm.stream_complete(prompt=prompt)  # Utilisez 'invoke' ou 'generate' selon ce qui est correct
-        return response.strip()
+        return response
 
  
     def process_user_response(self, user_input: str) -> str:
