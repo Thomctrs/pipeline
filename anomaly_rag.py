@@ -2,7 +2,6 @@ from typing import List, Dict, Union
 import numpy as np
 from neo4j import GraphDatabase
 from sklearn.metrics.pairwise import cosine_similarity
-from llama_index.core.data_structs.node import Node
 from pydantic import BaseModel
 import os
 import re
@@ -86,15 +85,15 @@ class Pipeline:
         return [item for item in data if isinstance(item['description'], str) and isinstance(item['title'], str)]
 
     def compute_embeddings_for_combined_texts(self, texts):
-        # Utiliser directement les textes
-        embeddings = [self.embed_model(text) for text in texts]
+        # Génère les embeddings pour une liste de textes
+        embeddings = [self.embed_model.content(text) for text in texts]
         embeddings = np.array(embeddings)
         return embeddings
 
     def recalculate_embeddings_for_test_anomalies(self, test_anomaly_title, test_anomaly_description):
-        # Combine le titre et la description
+        # Combine le titre et la description et génère l'embedding pour ce texte
         combined_text = f"{test_anomaly_title} {test_anomaly_description}"
-        test_embedding = self.embed_model(combined_text)
+        test_embedding = self.embed_model.content(combined_text)
         return np.array([test_embedding])
 
     def get_most_similar_anomalies(self, test_anomaly_embedding, anomaly_embeddings):
@@ -152,7 +151,7 @@ class Pipeline:
 
         if self.conversation_state == "start" and user_input != "reset":
             self.anomaly_data['start'] = user_input
-            self.conversation_state = "ask_title"
+            self.conversation_state = "first_query"
             return self.ask_next_question()
         
         elif self.conversation_state == "first_query" and user_input != "reset":
