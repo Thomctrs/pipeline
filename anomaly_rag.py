@@ -36,7 +36,7 @@ class Pipeline:
         self.conversation_state = "start" 
 
     async def on_startup(self):
-        
+
         from llama_index.embeddings.ollama import OllamaEmbedding
         from llama_index.llms.ollama import Ollama
         from llama_index.core import Settings, VectorStoreIndex, SimpleDirectoryReader
@@ -49,8 +49,6 @@ class Pipeline:
             model=self.valves.LLAMAINDEX_MODEL_NAME,
             base_url=self.valves.LLAMAINDEX_OLLAMA_BASE_URL,
         )
-
-
 
         global documents, index
 
