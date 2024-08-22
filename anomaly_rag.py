@@ -45,8 +45,7 @@ class Pipeline:
             base_url=self.valves.LLAMAINDEX_OLLAMA_BASE_URL,
         )
         Settings.llm = ChatOllama(
-            model=self.valves.LLAMAINDEX_MODEL_NAME,
-            base_url=self.valves.LLAMAINDEX_OLLAMA_BASE_URL,
+            model=self.valves.LLAMAINDEX_MODEL_NAME
         )
 
         global documents, index
