@@ -5,7 +5,7 @@ import asyncio
 from neo4j import GraphDatabase
 from pydantic import BaseModel
 
-class pipeline:
+class Pipeline:
     class Valves(BaseModel):
         NEO4J_URI: str
         NEO4J_USER: str
@@ -71,7 +71,7 @@ class pipeline:
 class PipeGH:
     @staticmethod
     async def run_pipeline(problem: str, description: str, category: str, severity: str) -> str:
-        pipeline_create = pipeline()
+        pipeline_create = Pipeline()
         result = pipeline_create.pipe(problem, description, category, severity)
         return result
     
