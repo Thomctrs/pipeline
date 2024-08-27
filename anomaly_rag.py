@@ -93,7 +93,7 @@ class Pipeline:
     def recalculate_embeddings_for_test_anomalies(self, test_anomaly_title, test_anomaly_description):
         # Combine le titre et la description et génère l'embedding pour ce texte
         combined_text = f"{test_anomaly_title} {test_anomaly_description}"
-        test_embedding = self.embed_model.content(combined_text)
+        test_embedding = self.embed_model.content(combined_text) 
         return np.array([test_embedding])
 
     def get_most_similar_anomalies(self, test_anomaly_embedding, anomaly_embeddings):
