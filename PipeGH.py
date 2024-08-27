@@ -4,6 +4,7 @@ import os
 import asyncio
 from neo4j import GraphDatabase
 from pydantic import BaseModel
+
 class pipeline:
     class Valves(BaseModel):
         NEO4J_URI: str
@@ -67,7 +68,7 @@ class pipeline:
 
     def pipe(self, problem: str, description: str, category: str, severity: str) -> str:
         return self.create_corrective_action_plan(problem, description, category, severity)
-class ExamplePipeline:
+class PipeGH:
     @staticmethod
     async def run_pipeline(problem: str, description: str, category: str, severity: str) -> str:
         pipeline_create = pipeline()
@@ -76,7 +77,7 @@ class ExamplePipeline:
     
     
 def test_pipeline():
-    pipeline = ExamplePipeline()
+    pipeline = PipeGH()
     result = asyncio.run(pipeline.run_pipeline(
         problem="Managed Repositories and Proxied Repositories buttons under Administration are not displayed when using Internet Explorer 7.",
         description="Managed Repositories issue",
