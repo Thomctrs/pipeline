@@ -4,7 +4,7 @@ import os
 import asyncio
 from neo4j import GraphDatabase
 from pydantic import BaseModel
-class CorrectiveActionPlanPipeline:
+class pipeline:
     class Valves(BaseModel):
         NEO4J_URI: str
         NEO4J_USER: str
@@ -70,9 +70,11 @@ class CorrectiveActionPlanPipeline:
 class ExamplePipeline:
     @staticmethod
     async def run_pipeline(problem: str, description: str, category: str, severity: str) -> str:
-        pipeline = CorrectiveActionPlanPipeline()
-        result = pipeline.pipe(problem, description, category, severity)
+        pipeline_create = pipeline()
+        result = pipeline_create.pipe(problem, description, category, severity)
         return result
+    
+    
 def test_pipeline():
     pipeline = ExamplePipeline()
     result = asyncio.run(pipeline.run_pipeline(
