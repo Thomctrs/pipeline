@@ -1,11 +1,11 @@
-from typing import List, Dict, Union
+from typing import List, Dict
 import json
 import os
 import asyncio
 from neo4j import GraphDatabase
 from pydantic import BaseModel
 
-class Pipeline:
+class Pipeline:  # Renommé en 'Pipeline'
     class Valves(BaseModel):
         NEO4J_URI: str
         NEO4J_USER: str
@@ -24,7 +24,6 @@ class Pipeline:
         return GraphDatabase.driver(self.valves.NEO4J_URI, auth=(self.valves.NEO4J_USER, self.valves.NEO4J_PASSWORD))
 
     def retrieve_and_visualize_similar_anomalies(self, problem: str, description: str, category: str, severity: str) -> List[Dict[str, str]]:
-        # Retrieve similar anomalies based on provided parameters
         query = """
         MATCH (fa:FicheAnomalie)
         WHERE fa.fan_categorie = $category AND fa.fan_gravite_decision = $severity
@@ -36,46 +35,42 @@ class Pipeline:
             return [{"title": record["title"], "description": record["description"]} for record in result]
 
     def analyze_resolutions(self, similar_anomalies: List[Dict[str, str]]) -> List[str]:
-        # Analyze resolutions based on similar anomalies
         resolutions = []
         for anomaly in similar_anomalies:
             resolutions.append(f"Resolution for '{anomaly['title']}': Implement fix based on findings.")
         return resolutions
 
     def create_corrective_action_plan(self, problem: str, description: str, category: str, severity: str) -> str:
-        # Step A: Retrieve similar anomalies
         similar_anomalies = self.retrieve_and_visualize_similar_anomalies(problem, description, category, severity)
 
         if not similar_anomalies:
             return json.dumps({"error": "No similar anomalies found."})
 
-        # Step B: Analyze resolutions from similar anomalies
         resolutions = self.analyze_resolutions(similar_anomalies)
 
-        # Step C: Develop a structured corrective action plan
         corrective_action_plan = {
             "problem": problem,
             "description": description,
             "category": category,
             "severity": severity,
             "actions": resolutions,
-            "responsible_persons": ["Assign responsible persons here"],  # To be filled
-            "deadlines": ["Define deadlines here"],  # To be filled
+            "responsible_persons": ["Assign responsible persons here"],
+            "deadlines": ["Define deadlines here"],
         }
-
-        # Step D: Return the plan in structured JSON format
         return json.dumps(corrective_action_plan)
 
     def pipe(self, problem: str, description: str, category: str, severity: str) -> str:
         return self.create_corrective_action_plan(problem, description, category, severity)
+
+
 class PipeGH:
     @staticmethod
     async def run_pipeline(problem: str, description: str, category: str, severity: str) -> str:
         pipeline_create = Pipeline()
         result = pipeline_create.pipe(problem, description, category, severity)
         return result
-    
-    
+
+
 def test_pipeline():
     pipeline = PipeGH()
     result = asyncio.run(pipeline.run_pipeline(
