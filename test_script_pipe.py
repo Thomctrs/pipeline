@@ -299,7 +299,7 @@ class Pipeline:
         return result
 
     
-    class test:
+    class test_script_:
         @staticmethod
         async def run_pipeline(user_message: str, model_id: str, messages: List[dict], body: dict) -> str:
      
