@@ -5,7 +5,7 @@ import asyncio
 from neo4j import GraphDatabase
 from pydantic import BaseModel
 
-class Pipeline:  # Renommé en 'Pipeline'
+class Pipeline:  
     class Valves(BaseModel):
         NEO4J_URI: str
         NEO4J_USER: str
@@ -79,6 +79,7 @@ def test_pipeline():
         category="Bug",
         severity="Major"
     ))
+
     assert result is not None, "The result must not be None"
     assert isinstance(result, str), "The result must be a string"
 
