@@ -299,7 +299,7 @@ class Pipeline:
         return result
 
     
-    class AnomalyRetrievalAndRecommendationPipeline:
+    class test:
         @staticmethod
         async def run_pipeline(user_message: str, model_id: str, messages: List[dict], body: dict) -> str:
      
