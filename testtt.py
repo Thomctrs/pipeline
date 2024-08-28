@@ -74,7 +74,7 @@ class Pipeline:
         pass
  
     def extract_title_from_prompt(self, user_input: str) -> str:
-        # Utilise une expression régulière pour  la partie après "here is the title of my anomaly: "
+        # Utilise une expression régulière pour la partie après "here is the title of my anomaly: "
         match = re.search(r"the title of my anomaly: (.+)", user_input, re.IGNORECASE)
         if match:
             return match.group(1).strip()
