@@ -74,7 +74,7 @@ class PipeGH:
 def test_pipeline():
     pipeline = PipeGH()
     result = asyncio.run(pipeline.run_pipeline(
-        problem="Managed Repositories and Proxied Repositories buttons under Administration are not displayed when using Internet Explorer 7.",
+        problem="Managed important Repositories and Proxied Repositories buttons under Administration are not displayed when using Internet Explorer 7.",
         description="Managed Repositories issue",
         category="Bug",
         severity="Major"
